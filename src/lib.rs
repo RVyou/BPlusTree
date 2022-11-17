@@ -75,14 +75,8 @@ impl DecodableU8 for ValueTest {
 }
 
 
-/// |u8 (00000000-》1有效  10 root位置 100 节点位置  1000叶子位置  10000额外动态数据位)| u64 key个数| u64数据个数 |u64 可存储数据大小| u64 写一个节点位置| u64上一个节点位置|
-/// 数据部分  |u64 数据实际长度(包括key) | key |数据限制长度+u64数据页位置|  or  |u64 偏移|key | u64偏移|...采用 wiki B+tree 实现方式
-// 是否要把页的大小写进去？是否还需要标记位标记数据是否是动态长度？？(大部分多部分常考 MySQL B+Tree)
-// 1.数据需要实现 decode encode trait; 先编写(泛型参数key和value) LRU 做页、空闲页、数据页、缓存
-// 2.搜索(最小值，最大值，范围，精确单条 多条) 与 插入规则
-// 3.删除规则 ---> rust 重新以前 golang 写的小工具 数据持久化从 csv 变成B+树
-// 4.重新构建整个b+树，(删除空洞)
-// 5.支持线程安全
+
+// tree(pub 接口，缓存lru，并发安全,可变静态变量配置，写入存储)====》》》node(底层驱动decode encode)
 #[cfg(test)]
 mod tests {
     use std::io::{Cursor, Read, Write};
@@ -101,7 +95,7 @@ mod tests {
                 .write(true)
                 .read(true)
                 .open("./experiment.db").expect("文件打开 or 创建  失败");
-            let mut data: [u8; 16384] = [0; 16384];
+            let  data: [u8; 16384] = [0; 16384];
             let value = ValueTest {
                 id: 16,
                 data: String::from("asadfoqnljasdfjoij"),
